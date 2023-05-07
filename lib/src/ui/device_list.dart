@@ -196,7 +196,7 @@ class _DeviceListState extends State<_DeviceList> {
                   ),
                   ...widget.scannerState.discoveredDevices
                       .map(
-                        (device) => ListTile(
+                        (device) => device.name == "ESP32" ? ListTile(
                           title: Text(device.name.isEmpty ? "(null)" : device.name),
                           subtitle: device.manufacturerData.length < 25 ? 
                           Text("${device.id}\nRSSI: ${device.rssi} dBm\nMajor : null\nMinor : null\nTX Power : null\nDistance: ${f.format(pow(10, ((double.parse(rssi1M.text))-(device.rssi))/10*double.parse(calibrate.text)))} Meters") :
@@ -210,7 +210,7 @@ class _DeviceListState extends State<_DeviceList> {
                                     builder: (_) =>
                                         DeviceDetailScreen(device: device)));
                           },
-                        ),
+                        ) : ListTile(),
                       )
                       .toList(),
                 ],
