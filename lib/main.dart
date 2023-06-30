@@ -7,7 +7,10 @@ import 'package:ble_scanner/src/ble/ble_status_monitor.dart';
 import 'package:ble_scanner/src/ui/ble_status_screen.dart';
 import 'package:ble_scanner/src/ui/device_list.dart';
 import 'package:provider/provider.dart';
+import './src/mqtt/state/MQTTAppState.dart';
+import './src/mqtt/MQTTManager.dart';
 
+import 'src/globals.dart' as globals;
 import 'src/ble/ble_logger.dart';
 
 const _themeColor = Colors.lightGreen;
@@ -31,7 +34,15 @@ void main() {
     subscribeToCharacteristic: _ble.subscribeToCharacteristic,
     logMessage: _bleLogger.addToLog,
   );
-  runApp(
+  
+  globals.TXmanager = MQTTManager(
+        host: globals.mqtt_host,
+        topic: "tx",
+        identifier: "Android",);
+        // state: currentAppState);
+  globals.TXmanager.initializeMQTTClient();
+  globals.TXmanager.connect();
+  runApp(    
     MultiProvider(
       providers: [
         Provider.value(value: _scanner),
@@ -73,7 +84,7 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({
     Key? key,
   }) : super(key: key);
-
+  
   @override
   Widget build(BuildContext context) => Consumer<BleStatus?>(
         builder: (_, status, __) {

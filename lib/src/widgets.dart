@@ -10,6 +10,16 @@ class BluetoothIcon extends StatelessWidget {
         child: Align(alignment: Alignment.center, child: Icon(Icons.bluetooth)),
       );
 }
+class trilaterationIcon extends StatelessWidget {
+  const trilaterationIcon({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(
+        width: 64,
+        height: 64,
+        child: Align(alignment: Alignment.center, child: Icon(Icons.location_on)),
+      );
+}
 
 class StatusMessage extends StatelessWidget {
   const StatusMessage({
