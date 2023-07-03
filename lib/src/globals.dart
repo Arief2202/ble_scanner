@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unused_import, prefer_interpolation_to_compose_strings
 
 library globals;
 import 'package:flutter/material.dart';
@@ -8,14 +8,29 @@ import 'package:simple_kalman/simple_kalman.dart';
 import './mqtt/state/MQTTAppState.dart';
 import './mqtt/MQTTManager.dart';
 
+bool showParkir = false;
+
+const themeColor = Colors.deepPurple;
+
+String endpoint = "http://absensi.ppns.eepis.tech";
+
+String endpoint_get_all = endpoint + "/location/get_all.php";
+String endpoint_karyawan_get = endpoint + "/user/get.php";
+String endpoint_list_karyawan_get_all = endpoint + "/user/get_all.php";
+String endpoint_monitor_karyawan_get_all = endpoint + "/monitor_karyawan/get_all.php";
+String endpoint_history_presensi_get_all = endpoint + "/history_presensi/get_all.php";
+String endpoint_cek_absensi = endpoint + "/location/update.php";
+
 String nama_terdekat = "";
 String mqtt_host = "eepis.tech";
 String mqtt_topic_transmitt = "tx";
 String mqtt_topic_receive = "rx";
 
-String user_nuid = "1";
-String user_pass = "a";
-
+String user_nuid = "";
+String user_username = "";
+String user_pass = "";
+bool isLoggedIn = false;
+bool loadingAutologin = true;
 late MQTTManager TXmanager;
 late MQTTManager manager;
 late MQTTAppState currentAppState;

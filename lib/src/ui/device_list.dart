@@ -140,9 +140,7 @@ class _DeviceListState extends State<_DeviceList> {
       if(device.manufacturerData.length > 15){
         var major = (device.manufacturerData[20]<<8) + device.manufacturerData[21];
         var minor = (device.manufacturerData[22]<<8) + device.manufacturerData[23];
-        var txPower = device.manufacturerData[24] > 127 ? device.manufacturerData[24].toInt()-255 : device.manufacturerData[24];
         var rssi = globals.kalman![((major-1)*3)+(minor-1)].filtered(device.rssi.toDouble());
-        var title = device.name + " (${minor})";
         var jarak = rssiToDistance(rssi);
         d.jarak[index] = jarak;
         subtitle += "Jarak ${minor.toString()} : ${f.format(jarak)}\n";
@@ -203,7 +201,6 @@ class _DeviceListState extends State<_DeviceList> {
 
     var major = (device.manufacturerData[20]<<8) + device.manufacturerData[21];
     var minor = (device.manufacturerData[22]<<8) + device.manufacturerData[23];
-    var txPower = device.manufacturerData[24] > 127 ? device.manufacturerData[24].toInt()-255 : device.manufacturerData[24];
     var rssi = globals.kalman![((major-1)*3)+(minor-1)].filtered(device.rssi.toDouble());
     var title = device.name + " (${minor})";
     var jarak = rssiToDistance(rssi);

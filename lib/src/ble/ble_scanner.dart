@@ -151,8 +151,8 @@ class BleScanner implements ReactiveState<BleScannerState> {
       String msg = "nuid=${globals.user_nuid}";
       msg += "&password=${globals.user_pass}";
       msg += "&ruang=${globals.nama_terdekat}";
-      msg += "&x=${koordinat.x*10}";
-      msg += "&y=${koordinat.y*10}";
+      msg += "&x=${koordinat.x}";
+      msg += "&y=${koordinat.y}";
       if(koordinat.x != 0 && koordinat.y != 0) globals.TXmanager.publish(msg);
     }
 

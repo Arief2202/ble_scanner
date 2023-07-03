@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:ble_scanner/src/ui/loginPage.dart';
+import 'package:ble_scanner/src/ui/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:ble_scanner/src/ble/ble_device_connector.dart';
@@ -5,15 +9,18 @@ import 'package:ble_scanner/src/ble/ble_device_interactor.dart';
 import 'package:ble_scanner/src/ble/ble_scanner.dart';
 import 'package:ble_scanner/src/ble/ble_status_monitor.dart';
 import 'package:ble_scanner/src/ui/ble_status_screen.dart';
-import 'package:ble_scanner/src/ui/device_list.dart';
 import 'package:provider/provider.dart';
-import './src/mqtt/state/MQTTAppState.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import './src/mqtt/MQTTManager.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' show jsonDecode;
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'src/globals.dart' as globals;
 import 'src/ble/ble_logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-const _themeColor = Colors.lightGreen;
+const _themeColor = globals.themeColor;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +49,7 @@ void main() {
         // state: currentAppState);
   globals.TXmanager.initializeMQTTClient();
   globals.TXmanager.connect();
-  runApp(    
+  runApp(
     MultiProvider(
       providers: [
         Provider.value(value: _scanner),
@@ -71,28 +78,136 @@ void main() {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Flutter Reactive BLE example',
         color: _themeColor,
         theme: ThemeData(primarySwatch: _themeColor),
-        home: const HomeScreen(),
+        home: Phoenix(
+          child: const HomeScreen(),
+        ),
       ),
-    ),
+    )
   );
 }
 
-class HomeScreen extends StatelessWidget {
+
+
+// class HomeScreen extends StatelessWidget {
+//   const HomeScreen({
+//     Key? key,
+//   }) : super(key: key);
+  
+//   @override
+//   Widget build(BuildContext context) => Consumer<BleStatus?>(
+//     builder: (_, status, __) {
+//       return status == BleStatus.ready ? (globals.isLoggedIn ? Menu() : LoginPage()) : BleStatusScreen(status: status ?? BleStatus.unknown);
+//     },
+//   );
+// }
+
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     Key? key,
   }) : super(key: key);
-  
   @override
-  Widget build(BuildContext context) => Consumer<BleStatus?>(
-        builder: (_, status, __) {
-          if (status == BleStatus.ready) {
-            return const DeviceListScreen();
-          } else {
-            return BleStatusScreen(status: status ?? BleStatus.unknown);
-          }
-        },
-      );
+  _MyHomePageState createState() => _MyHomePageState();
 }
+
+class _MyHomePageState extends State<HomeScreen> {
+  TextEditingController nameController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    autoLogIn();
+  }
+
+  void autoLogIn() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? username = prefs.getString('user_username');
+    final String? password = prefs.getString('user_password');
+
+    if (username != null && password != null) {
+      setState(() {
+        globals.loadingAutologin = true;
+      });
+
+      var url = Uri.parse(globals.endpoint_karyawan_get);
+      final response = await http.post(url, body: {'username': username});
+      // context.loaderOverlay.hide();
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> parsed = jsonDecode(response.body);
+        if(parsed['password'] != password){          
+          await prefs.remove('user_username');
+          await prefs.remove('user_password');
+          setState(() {
+            globals.isLoggedIn = false;
+          });
+          Alert(
+            context: context,
+            type: AlertType.info,
+            title: "Login Failed!",
+            desc: "Please relogin",
+            buttons: [
+              DialogButton(
+                child: Text(
+                  "OK",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Phoenix.rebirth(context);
+                }
+              )
+            ],
+          ).show();
+        }
+        else{
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('user_nuid', (parsed['nuid']).toString());
+          await prefs.setString('user_username', parsed['username']);
+          await prefs.setString('user_password', parsed['password']);
+          setState(() {
+            globals.isLoggedIn = true;
+            globals.user_nuid = parsed['nuid'];
+            globals.user_username = parsed['username'];
+            globals.user_pass = parsed['password'];
+          });
+        }
+      }      
+      else{
+        await prefs.remove('user_username');
+        await prefs.remove('user_password');
+        setState(() {
+          globals.isLoggedIn = false;
+        });
+        Alert(
+          context: context,
+          type: AlertType.info,
+          title: "Login Failed!",
+          desc: "Please relogin",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "OK",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ).show();
+      }
+      return;
+    }
+  }
+
+  @override  
+  Widget build(BuildContext context) => Consumer<BleStatus?>(
+    builder: (_, status, __) {
+      return status == BleStatus.ready ? (globals.isLoggedIn ? Menu() : LoginPage()) : BleStatusScreen(status: status ?? BleStatus.unknown);
+    },
+  );
+}
+
+
