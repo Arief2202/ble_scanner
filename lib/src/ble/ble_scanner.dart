@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, unused_import
 
 import 'dart:async';
 
@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:ble_scanner/src/ble/reactive_state.dart';
 import 'package:meta/meta.dart';
-import 'dart:async';
 import 'dart:math';
 import '../mqtt/state/MQTTAppState.dart';
 import '../mqtt/MQTTManager.dart';
@@ -21,6 +20,8 @@ class BleScanner implements ReactiveState<BleScannerState> {
     required Function(String message) logMessage,
   })  : _ble = ble,
         _logMessage = logMessage;
+        
+  Timer? timer;
 
   final FlutterReactiveBle _ble;
   final void Function(String message) _logMessage;
@@ -33,7 +34,6 @@ class BleScanner implements ReactiveState<BleScannerState> {
   Stream<BleScannerState> get state => _stateStreamController.stream;
 
   void startScan(List<Uuid> serviceIds) async {
-    Timer? timer;
     timer = Timer.periodic(Duration(milliseconds: 5000), (Timer t) => updateValue());
     _logMessage('Start ble discovery');
     _devices.clear();
@@ -151,8 +151,8 @@ class BleScanner implements ReactiveState<BleScannerState> {
       String msg = "nuid=${globals.user_nuid}";
       msg += "&password=${globals.user_pass}";
       msg += "&ruang=${globals.nama_terdekat}";
-      msg += "&x=${koordinat.x}";
-      msg += "&y=${koordinat.y}";
+      msg += "&x=${koordinat.x*10}";
+      msg += "&y=${koordinat.y*10}";
       if(koordinat.x != 0 && koordinat.y != 0) globals.TXmanager.publish(msg);
     }
 
@@ -178,13 +178,10 @@ class BleScanner implements ReactiveState<BleScannerState> {
   globals.coordinates trilateration(globals.bleDevices d){
     globals.coordinates result;
     var count = 0;
-    var title = "";
-    var subtitle = "";
     var x = 0.00;
     var y = 0.00;
     for(var data in d.ble){
       if(data.manufacturerData.length > 15){
-        title = data.name;
         count++;
       }
     }

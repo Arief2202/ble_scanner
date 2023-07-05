@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:ble_scanner/src/mqtt/state/MQTTAppState.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';

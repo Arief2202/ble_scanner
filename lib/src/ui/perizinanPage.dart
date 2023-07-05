@@ -1,4 +1,4 @@
-// ignore_for_file: sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_const_constructors, avoid_print, use_key_in_widget_constructors
+// ignore_for_file: sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_const_constructors, avoid_print, use_key_in_widget_constructors, unused_local_variable, unnecessary_null_comparison, dead_code, unused_import
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -27,6 +27,7 @@ class PerizinanPageState extends State<PerizinanPage>
     timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => updateValue());
     checkin = Absensi(id: "", nuid: "", timestamp: "", aksi: "", pesan: "", color: "");
     checkout = Absensi(id: "", nuid: "", timestamp: "", aksi: "", pesan: "", color: "");
+    super.initState();
   }
 
   void updateValue() async{

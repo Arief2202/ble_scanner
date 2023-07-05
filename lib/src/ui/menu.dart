@@ -1,4 +1,4 @@
-// ignore_for_file: curly_braces_in_flow_control_structures, prefer_const_constructors, sort_child_properties_last, unused_local_variable
+// ignore_for_file: curly_braces_in_flow_control_structures, prefer_const_constructors, sort_child_properties_last, unused_local_variable, unused_import
 
 import 'package:ble_scanner/src/ui/perizinanPage.dart';
 import 'package:flutter/material.dart';

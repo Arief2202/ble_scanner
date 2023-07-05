@@ -17,7 +17,6 @@ class LoginPage extends StatefulWidget {
 class LoginPageState extends State<LoginPage> {
   List<TextEditingController> _data = [TextEditingController(), TextEditingController()];
   List<bool> _error = [false, false, false, false];
-  String _passwordMsg = "Value Can\'t Be Empty";
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +96,6 @@ class LoginPageState extends State<LoginPage> {
   Future _doLogin(context) async {
     bool status = true;
     setState(() {
-      _passwordMsg = "Value Can\'t Be Empty";
       for (int a = 0; a < 2; a++) {
         if (_data[a].text.isEmpty) {
           _error[a] = true;
