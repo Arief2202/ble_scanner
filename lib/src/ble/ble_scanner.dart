@@ -252,13 +252,13 @@ class BleScanner implements ReactiveState<BleScannerState> {
   }
   double rssiToDistance(double rssi) {
     double distance;
-    double referenceRssi = -50;
-    double referenceDistance = 0.944;
-    double pathLossExponent = 0.3;
+    double referenceRssi = -40.00;
+    double referenceDistance = 1.00;
+    double pathLossExponent = 0.33;
     double flatFadingMitigation = 0;
     double rssiDiff = rssi - referenceRssi - flatFadingMitigation;
 
-    double i =  pow(10, -(rssiDiff/ 10 * pathLossExponent)).toDouble();
+    double i =  pow(10, -(rssiDiff/ 10 * pathLossExponent) - ((rssi/1000)*-1)).toDouble();
 
     distance = referenceDistance * i;
 
