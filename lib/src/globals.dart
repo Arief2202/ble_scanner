@@ -8,7 +8,7 @@ import 'package:simple_kalman/simple_kalman.dart';
 import './mqtt/state/MQTTAppState.dart';
 import './mqtt/MQTTManager.dart';
 
-bool showParkir = true;
+bool showParkir = false;
 
 const themeColor = Colors.deepPurple;
 
@@ -108,7 +108,7 @@ bleDevices M203 = bleDevices(
 bleDevices parkiran = bleDevices(
   "parkiran",
   [0, 0, 0],
-  [coordinates(0, 10.0), coordinates(15.0, 0), coordinates(30.0, 10.0)],
+  [coordinates(0, 0), coordinates(15.0, 10.0), coordinates(30.0, 0)],
   [
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),

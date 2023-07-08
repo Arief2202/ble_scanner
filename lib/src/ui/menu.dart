@@ -179,7 +179,7 @@ class MenuState extends State<MenuStateful> {
             child: Card(
               child: Padding(
                 padding: EdgeInsets.only(top: 15, left:15, right:15, bottom: 15),
-                child: Text("NUID : ${globals.user_nuid}\n\nName : ${globals.user_name}\n\nUsername : ${globals.user_username}\n\nEmail : ${globals.user_email}\n\nLokasi (${globals.user_current_ruang})\nX : ${f.format(globals.user_current_x)}\nY : ${f.format(globals.user_current_y)}"),
+                child: Text("NUID : ${globals.user_nuid}\n\nName : ${globals.user_name}\n\nUsername : ${globals.user_username}\n\nEmail : ${globals.user_email}\n\nLokasi (${globals.user_current_ruang})"),
               ),
             ),
           ),

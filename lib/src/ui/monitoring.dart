@@ -56,16 +56,14 @@ class MonitoringPageStateful extends StatefulWidget {
 
 class MonitoringPageState extends State<MonitoringPageStateful> {
   Timer? timer;
-  late List<UserLocation>? userLocation;
+  late UserLocation? userLocation;
   late TextEditingController _uuidController;
   var f = NumberFormat("###0.0#", "en_US");
 
   @override
   void initState() {
     timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => updateValue());
-    userLocation = [
-      UserLocation(nuid: "0", name: "", username: "", email: "", currentLocation: Location(x: "0", y: "0", ruang: "M103", timestamp: "")),
-    ];
+    userLocation = UserLocation(nuid: "0", name: "", username: "", email: "", currentLocation: Location(x: "0", y: "0", ruang: "M103", timestamp: ""));
     super.initState();
     _uuidController = TextEditingController()
       ..addListener(() => setState(() {}));
@@ -97,13 +95,27 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
   }
 
   void updateValue() async {
-    var url = Uri.parse(globals.endpoint_get_all);
-    var response = await http.get(url);
+    var url = Uri.parse(globals.endpoint_karyawan_get);
+    var response = await http.post(url, body: {'nuid': globals.user_nuid});
     if (response.statusCode == 200) {
-      debugPrint(jsonDecode(response.body).toString());
+      Map<String, dynamic> parsed = jsonDecode(response.body);
       if (this.mounted) {
         setState(() {
-          userLocation = List<UserLocation>.from((jsonDecode(response.body) as List).map((x) => UserLocation.fromJson(x)).where((content) => content.nuid != null));
+          userLocation = UserLocation(
+            nuid: parsed['nuid'], 
+            name: parsed['name'], 
+            username: parsed['username'], 
+            email: parsed['email'], 
+            currentLocation: 
+              Location(
+                x: parsed['currentLocation']['x'], 
+                y: parsed['currentLocation']['y'], 
+                ruang: parsed['currentLocation']['ruang'], 
+                timestamp: parsed['currentLocation']['timestamp'])
+          );
+
+          // userLocation = 
+          // userLocation = List<UserLocation>.from((jsonDecode(response.body)).map((x) => UserLocation.fromJson(x)).where((content) => content.nuid != null));
         });
       }
     }
@@ -132,7 +144,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
               child: Stack(
                 children: <Widget>[                  
                   globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp1.png') : Image.asset(width: mapWidth, 'assets/img/m1.png'),
-                  for (UserLocation user in userLocation!) user.currentLocation.ruang[1] == '1' || user.currentLocation.ruang == "parkiran" ? dots(user, user.currentLocation.x, user.currentLocation.y, user.currentLocation.ruang, mapWidth, context) : SizedBox(),
+                    userLocation!.currentLocation.ruang[1] == '1' || userLocation!.currentLocation.ruang == "parkiran" ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
                 ]
               )
             ),
@@ -141,7 +153,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
               child: Stack(
                 children: <Widget>[
                   globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp2.png') : Image.asset(width: mapWidth, 'assets/img/m2.png'),
-                  for (UserLocation user in userLocation!) user.currentLocation.ruang[1] == '2' ? dots(user, user.currentLocation.x, user.currentLocation.y, user.currentLocation.ruang, mapWidth, context) : SizedBox(),
+                  userLocation!.currentLocation.ruang[1] == '2' ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
                 ]
               )
             ),
@@ -172,8 +184,8 @@ Widget dots(UserLocation user, String xStr, String yStr, String ruang, double wi
   if(globals.showParkir) totalWidth = 610; //map dengan parkir
   int plusX = 0;
   int plusY = (width / (totalWidth / 96)).toInt();
-  double scaleCircle = 25;
-  double scaleText = 30;
+  double scaleCircle = 15;
+  double scaleText = 20;
   if (ruang == "parkiran") {
     plusX = (width / (totalWidth / 310)).toInt();
     plusY = (width / (totalWidth / 84)).toInt();
