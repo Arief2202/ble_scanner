@@ -8,7 +8,7 @@ import 'package:simple_kalman/simple_kalman.dart';
 import './mqtt/state/MQTTAppState.dart';
 import './mqtt/MQTTManager.dart';
 
-bool showParkir = false;
+bool showParkir = true;
 
 const themeColor = Colors.deepPurple;
 
@@ -27,14 +27,33 @@ String mqtt_topic_transmitt = "tx";
 String mqtt_topic_receive = "rx";
 
 String user_nuid = "";
+String user_name = "";
 String user_username = "";
+String user_email = "";
 String user_pass = "";
+
+String user_current_ruang = "";
+double user_current_x = 0;
+double user_current_y = 0;
+
+
 bool isLoggedIn = false;
 bool loadingAutologin = true;
 late MQTTManager TXmanager;
 late MQTTManager manager;
 late MQTTAppState currentAppState;
 String msg = "";
+
+bleDevices nowLocation = bleDevices(
+  "M102",
+  [0, 0, 0],
+  [coordinates(0, 8.8), coordinates(3.8, 0), coordinates(7.6, 8.8)],
+  [
+    DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
+    DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
+    DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
+  ]
+);
 
 bleDevices M102 = bleDevices(
   "M102",

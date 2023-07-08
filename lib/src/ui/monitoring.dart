@@ -137,7 +137,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
               )
             ),
             SizedBox(height: 10),
-            Center(
+            globals.showParkir ? Container() : Center(
               child: Stack(
                 children: <Widget>[
                   globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp2.png') : Image.asset(width: mapWidth, 'assets/img/m2.png'),

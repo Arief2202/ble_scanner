@@ -62,9 +62,11 @@ class BleScanner implements ReactiveState<BleScannerState> {
     List<bool> M202f = [false, false, false];
     List<bool> M203f = [false, false, false];
     List<bool> parkiranf = [false, false, false];
+    var bleCount = 0;
     for(var device in _devices){
       var title = device.name;
       if((title == "M102" || title == "M103" || title == "M104" || title == "M202" || title == "M203" || title == "parkiran") && device.manufacturerData.length > 15){
+        bleCount++;
         // var major = (device.manufacturerData[20]<<8) + device.manufacturerData[21];
         var minor = (device.manufacturerData[22]<<8) + device.manufacturerData[23];
         // var txPower = device.manufacturerData[24] > 127 ? device.manufacturerData[24].toInt()-255 : device.manufacturerData[24];
@@ -111,6 +113,18 @@ class BleScanner implements ReactiveState<BleScannerState> {
       if(M202f[a] == false) globals.M202.ble[a] = DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []);
       if(M203f[a] == false) globals.M203.ble[a] = DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []);
       if(parkiranf[a] == false) globals.parkiran.ble[a] = DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []);
+    }
+    if(bleCount > 0){      
+      String msg = "nuid=${globals.user_nuid}";
+      msg += "&password=${globals.user_pass}";
+      msg += "&aksi=checkin";
+      globals.TXmanager.publish(msg);
+    }
+    else{
+      String msg = "nuid=${globals.user_nuid}";
+      msg += "&password=${globals.user_pass}";
+      msg += "&aksi=checkout";
+      globals.TXmanager.publish(msg);
     }
     
     double terdekat = -100;

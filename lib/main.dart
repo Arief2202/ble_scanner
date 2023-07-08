@@ -171,8 +171,13 @@ class _MyHomePageState extends State<HomeScreen> {
           setState(() {
             globals.isLoggedIn = true;
             globals.user_nuid = parsed['nuid'];
+            globals.user_name = parsed['name'];
+            globals.user_email = parsed['email'];
             globals.user_username = parsed['username'];
             globals.user_pass = parsed['password'];
+            globals.user_current_ruang = parsed['currentLocation']['ruang'];
+            globals.user_current_x = double.parse(parsed['currentLocation']['x']);
+            globals.user_current_y = double.parse(parsed['currentLocation']['y']);
           });
         }
       }      
