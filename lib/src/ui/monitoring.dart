@@ -12,13 +12,11 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-
 class MonitoringPage extends StatelessWidget {
   const MonitoringPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer3<BleScanner, BleScannerState?, BleLogger>(
+  Widget build(BuildContext context) => Consumer3<BleScanner, BleScannerState?, BleLogger>(
         builder: (_, bleScanner, bleScannerState, bleLogger, __) => MonitoringPageStateful(
           scannerState: bleScannerState ??
               const BleScannerState(
@@ -65,9 +63,8 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
     timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => updateValue());
     userLocation = UserLocation(nuid: "0", name: "", username: "", email: "", currentLocation: Location(x: "0", y: "0", ruang: "M103", timestamp: ""));
     super.initState();
-    _uuidController = TextEditingController()
-      ..addListener(() => setState(() {}));
-    if(!widget.scannerState.scanIsInProgress && _isValidUuidInput()) _startScanning();
+    _uuidController = TextEditingController()..addListener(() => setState(() {}));
+    if (!widget.scannerState.scanIsInProgress && _isValidUuidInput()) _startScanning();
   }
 
   @override
@@ -89,6 +86,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
       }
     }
   }
+
   void _startScanning() {
     final text = _uuidController.text;
     widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController.text)]);
@@ -101,20 +99,9 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
       Map<String, dynamic> parsed = jsonDecode(response.body);
       if (this.mounted) {
         setState(() {
-          userLocation = UserLocation(
-            nuid: parsed['nuid'], 
-            name: parsed['name'], 
-            username: parsed['username'], 
-            email: parsed['email'], 
-            currentLocation: 
-              Location(
-                x: parsed['currentLocation']['x'], 
-                y: parsed['currentLocation']['y'], 
-                ruang: parsed['currentLocation']['ruang'], 
-                timestamp: parsed['currentLocation']['timestamp'])
-          );
+          userLocation = UserLocation(nuid: parsed['nuid'], name: parsed['name'], username: parsed['username'], email: parsed['email'], currentLocation: Location(x: parsed['currentLocation']['x'], y: parsed['currentLocation']['y'], ruang: parsed['currentLocation']['ruang'], timestamp: parsed['currentLocation']['timestamp']));
 
-          // userLocation = 
+          // userLocation =
           // userLocation = List<UserLocation>.from((jsonDecode(response.body)).map((x) => UserLocation.fromJson(x)).where((content) => content.nuid != null));
         });
       }
@@ -141,22 +128,18 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
           children: <Widget>[
             SizedBox(height: 50),
             Center(
-              child: Stack(
-                children: <Widget>[                  
-                  globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp1.png') : Image.asset(width: mapWidth, 'assets/img/m1.png'),
-                    userLocation!.currentLocation.ruang[1] == '1' || userLocation!.currentLocation.ruang == "parkiran" ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
-                ]
-              )
-            ),
+                child: Stack(children: <Widget>[
+              globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp1.png') : Image.asset(width: mapWidth, 'assets/img/m1.png'),
+              userLocation!.currentLocation.ruang[1] == '1' || userLocation!.currentLocation.ruang == "parkiran" ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
+            ])),
             SizedBox(height: 10),
-            globals.showParkir ? Container() : Center(
-              child: Stack(
-                children: <Widget>[
-                  globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp2.png') : Image.asset(width: mapWidth, 'assets/img/m2.png'),
-                  userLocation!.currentLocation.ruang[1] == '2' ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
-                ]
-              )
-            ),
+            globals.showParkir
+                ? Container()
+                : Center(
+                    child: Stack(children: <Widget>[
+                    globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp2.png') : Image.asset(width: mapWidth, 'assets/img/m2.png'),
+                    userLocation!.currentLocation.ruang[1] == '2' ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
+                  ])),
             SizedBox(height: 50),
           ],
         ),
@@ -181,7 +164,7 @@ Widget dots(UserLocation user, String xStr, String yStr, String ruang, double wi
   double x = double.parse(xStr);
   double y = double.parse(yStr);
   int totalWidth = 310; //map tanpa parkir
-  if(globals.showParkir) totalWidth = 610; //map dengan parkir
+  if (globals.showParkir) totalWidth = 510; //map dengan parkir
   int plusX = 0;
   int plusY = (width / (totalWidth / 96)).toInt();
   double scaleCircle = 15;
@@ -199,23 +182,21 @@ Widget dots(UserLocation user, String xStr, String yStr, String ruang, double wi
     width: width / scaleCircle,
     height: width / scaleCircle,
     child: GestureDetector(
-      onTap: () {
-        Alert(
-          context: context,
-          desc: "NUID :\n${user.nuid}\n\nName :\n${user.name}\n\nUsername :\n${user.username}\n\nEmail :\n${user.email}\n\nLokasi (${user.currentLocation.ruang})\nX : ${f.format(double.parse(user.currentLocation.x))}\nY : ${f.format(double.parse(user.currentLocation.y))}",
-          buttons: [],
-          style: AlertStyle(
-            descStyle: TextStyle(fontSize: 15),
-            descTextAlign: TextAlign.start,
-          )
-        ).show();
-      },
-      child:  CircleAvatar(
-        backgroundColor: Color.fromARGB(200, 255, 0, 0),
-        child: Text(user.nuid, style: TextStyle(fontSize: width / scaleText)),
-        foregroundImage: NetworkImage("enterImageUrl"),
-      )
-    ),
+        onTap: () {
+          Alert(
+              context: context,
+              desc: "NUID :\n${user.nuid}\n\nName :\n${user.name}\n\nUsername :\n${user.username}\n\nEmail :\n${user.email}\n\nLokasi (${user.currentLocation.ruang})\nX : ${f.format(double.parse(user.currentLocation.x))}\nY : ${f.format(double.parse(user.currentLocation.y))}",
+              buttons: [],
+              style: AlertStyle(
+                descStyle: TextStyle(fontSize: 15),
+                descTextAlign: TextAlign.start,
+              )).show();
+        },
+        child: CircleAvatar(
+          backgroundColor: Color.fromARGB(200, 255, 0, 0),
+          child: Text(user.nuid, style: TextStyle(fontSize: width / scaleText)),
+          foregroundImage: NetworkImage("enterImageUrl"),
+        )),
   );
 }
 
