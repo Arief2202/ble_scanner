@@ -12,13 +12,11 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-
 class MonitoringPage extends StatelessWidget {
   const MonitoringPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer3<BleScanner, BleScannerState?, BleLogger>(
+  Widget build(BuildContext context) => Consumer3<BleScanner, BleScannerState?, BleLogger>(
         builder: (_, bleScanner, bleScannerState, bleLogger, __) => MonitoringPageStateful(
           scannerState: bleScannerState ??
               const BleScannerState(
@@ -65,9 +63,8 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
     timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => updateValue());
     userLocation = UserLocation(nuid: "0", name: "", username: "", email: "", currentLocation: Location(x: "0", y: "0", ruang: " ", timestamp: " "));
     super.initState();
-    _uuidController = TextEditingController()
-      ..addListener(() => setState(() {}));
-    if(!widget.scannerState.scanIsInProgress && _isValidUuidInput()) _startScanning();
+    _uuidController = TextEditingController()..addListener(() => setState(() {}));
+    if (!widget.scannerState.scanIsInProgress && _isValidUuidInput()) _startScanning();
   }
 
   @override
@@ -89,6 +86,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
       }
     }
   }
+
   void _startScanning() {
     final text = _uuidController.text;
     widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController.text)]);
@@ -111,7 +109,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
               Location( x: "0", y: "0", ruang: " ", timestamp: " ")
           );
 
-          // userLocation = 
+          // userLocation =
           // userLocation = List<UserLocation>.from((jsonDecode(response.body)).map((x) => UserLocation.fromJson(x)).where((content) => content.nuid != null));
         });
       }
@@ -189,7 +187,7 @@ Widget dots(UserLocation user, String xStr, String yStr, String ruang, double wi
   double x = double.parse(xStr);
   double y = double.parse(yStr);
   int totalWidth = 310; //map tanpa parkir
-  if(globals.showParkir) totalWidth = 610; //map dengan parkir
+  if (globals.showParkir) totalWidth = 510; //map dengan parkir
   int plusX = 0;
   int plusY = (width / (totalWidth / 96)).toInt();
   double scaleCircle = 15;
@@ -207,23 +205,21 @@ Widget dots(UserLocation user, String xStr, String yStr, String ruang, double wi
     width: width / scaleCircle,
     height: width / scaleCircle,
     child: GestureDetector(
-      onTap: () {
-        Alert(
-          context: context,
-          desc: "NUID :\n${user.nuid}\n\nName :\n${user.name}\n\nUsername :\n${user.username}\n\nEmail :\n${user.email}\n\nLokasi (${user.currentLocation.ruang})\nX : ${f.format(double.parse(user.currentLocation.x))}\nY : ${f.format(double.parse(user.currentLocation.y))}",
-          buttons: [],
-          style: AlertStyle(
-            descStyle: TextStyle(fontSize: 15),
-            descTextAlign: TextAlign.start,
-          )
-        ).show();
-      },
-      child:  CircleAvatar(
-        backgroundColor: Color.fromARGB(200, 255, 0, 0),
-        child: Text(user.nuid, style: TextStyle(fontSize: width / scaleText)),
-        foregroundImage: NetworkImage("enterImageUrl"),
-      )
-    ),
+        onTap: () {
+          Alert(
+              context: context,
+              desc: "NUID :\n${user.nuid}\n\nName :\n${user.name}\n\nUsername :\n${user.username}\n\nEmail :\n${user.email}\n\nLokasi (${user.currentLocation.ruang})\nX : ${f.format(double.parse(user.currentLocation.x))}\nY : ${f.format(double.parse(user.currentLocation.y))}",
+              buttons: [],
+              style: AlertStyle(
+                descStyle: TextStyle(fontSize: 15),
+                descTextAlign: TextAlign.start,
+              )).show();
+        },
+        child: CircleAvatar(
+          backgroundColor: Color.fromARGB(200, 255, 0, 0),
+          child: Text(user.nuid, style: TextStyle(fontSize: width / scaleText)),
+          foregroundImage: NetworkImage("enterImageUrl"),
+        )),
   );
 }
 
