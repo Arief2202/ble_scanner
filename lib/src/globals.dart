@@ -47,7 +47,7 @@ String msg = "";
 bleDevices nowLocation = bleDevices(
   "M102",
   [0, 0, 0],
-  [coordinates(0, 8.8), coordinates(3.8, 0), coordinates(7.6, 8.8)],
+  [coordinates(0, 0), coordinates(3.8, 8.8), coordinates(7.6, 0)],
   [
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
@@ -58,7 +58,7 @@ bleDevices nowLocation = bleDevices(
 bleDevices M102 = bleDevices(
   "M102",
   [0, 0, 0],
-  [coordinates(0, 8.8), coordinates(3.8, 0), coordinates(7.6, 8.8)],
+  [coordinates(0, 0), coordinates(3.8, 8.8), coordinates(7.6, 0)],
   [
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
@@ -68,7 +68,7 @@ bleDevices M102 = bleDevices(
 bleDevices M103 = bleDevices(
   "M103",
   [0, 0, 0],
-  [coordinates(0, 8.8), coordinates(4.1, 0), coordinates(8.2, 8.8)],
+  [coordinates(0, 0), coordinates(4.1, 8.8), coordinates(8.2, 0)],
   [
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
@@ -78,7 +78,7 @@ bleDevices M103 = bleDevices(
 bleDevices M104 = bleDevices(
   "M104",
   [0, 0, 0],
-  [coordinates(0, 8.8), coordinates(3.6, 0), coordinates(7.2, 8.8)],
+  [coordinates(0, 0), coordinates(3.6, 8.8), coordinates(7.2, 0)],
   [
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
@@ -88,7 +88,7 @@ bleDevices M104 = bleDevices(
 bleDevices M202 = bleDevices(
   "M202",
   [0, 0, 0],
-  [coordinates(0, 8.8), coordinates(38, 0), coordinates(7.6, 8.8)],
+  [coordinates(0, 0), coordinates(38, 8.8), coordinates(7.6, 0)],
   [
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
@@ -98,7 +98,7 @@ bleDevices M202 = bleDevices(
 bleDevices M203 = bleDevices(
   "M203",
   [0, 0, 0],
-  [coordinates(0, 8.8), coordinates(4.1, 0), coordinates(8.2, 8.8)],
+  [coordinates(0, 0), coordinates(4.1, 8.8), coordinates(8.2, 0)],
   [
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
@@ -108,7 +108,7 @@ bleDevices M203 = bleDevices(
 bleDevices parkiran = bleDevices(
   "parkiran",
   [0, 0, 0],
-  [coordinates(0, 0), coordinates(15.0, 10.0), coordinates(30.0, 0)],
+  [coordinates(0, 0), coordinates(10.0, 10.0), coordinates(20.0, 0)],
   [
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),
     DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []),

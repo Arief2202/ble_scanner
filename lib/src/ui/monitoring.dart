@@ -63,7 +63,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
   @override
   void initState() {
     timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => updateValue());
-    userLocation = UserLocation(nuid: "0", name: "", username: "", email: "", currentLocation: Location(x: "0", y: "0", ruang: "M103", timestamp: ""));
+    userLocation = UserLocation(nuid: "0", name: "", username: "", email: "", currentLocation: Location(x: "0", y: "0", ruang: " ", timestamp: " "));
     super.initState();
     _uuidController = TextEditingController()
       ..addListener(() => setState(() {}));
@@ -106,12 +106,9 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
             name: parsed['name'], 
             username: parsed['username'], 
             email: parsed['email'], 
-            currentLocation: 
-              Location(
-                x: parsed['currentLocation']['x'], 
-                y: parsed['currentLocation']['y'], 
-                ruang: parsed['currentLocation']['ruang'], 
-                timestamp: parsed['currentLocation']['timestamp'])
+            currentLocation: parsed['currentLocation'] != null ?
+              Location( x: parsed['currentLocation']['x'], y: parsed['currentLocation']['y'], ruang: parsed['currentLocation']['ruang'], timestamp: parsed['currentLocation']['timestamp']) :
+              Location( x: "0", y: "0", ruang: " ", timestamp: " ")
           );
 
           // userLocation = 
@@ -139,12 +136,23 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
           scrollDirection: Axis.vertical,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(height: 50),
+            Container(
+              margin: EdgeInsets.only(left: 30, right: 30, top: 20),
+              height: 90.0,
+              width: 200.0,
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 15, left:15, right:15, bottom: 15),
+                  child: Text("Lokasi (${userLocation!.currentLocation.ruang})\nX : ${f.format(double.parse(userLocation!.currentLocation.x))}\nY : ${f.format(double.parse(userLocation!.currentLocation.y))}"),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             Center(
               child: Stack(
                 children: <Widget>[                  
                   globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp1.png') : Image.asset(width: mapWidth, 'assets/img/m1.png'),
-                    userLocation!.currentLocation.ruang[1] == '1' || userLocation!.currentLocation.ruang == "parkiran" ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
+                    userLocation!.currentLocation.ruang == '1' || userLocation!.currentLocation.ruang == "parkiran" ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
                 ]
               )
             ),
@@ -153,7 +161,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
               child: Stack(
                 children: <Widget>[
                   globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp2.png') : Image.asset(width: mapWidth, 'assets/img/m2.png'),
-                  userLocation!.currentLocation.ruang[1] == '2' ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
+                  userLocation!.currentLocation.ruang == '2' ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
                 ]
               )
             ),
