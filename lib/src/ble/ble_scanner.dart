@@ -183,8 +183,10 @@ class BleScanner implements ReactiveState<BleScannerState> {
       msg += "&ruang=${globals.nama_terdekat}";
       msg += "&x=${koordinat.x*10}";
       msg += "&y=${koordinat.y*10}";
-      var url = Uri.parse(globals.endpoint_karyawan_get);
+      var url = Uri.parse(globals.endpoint_cek_absensi);
       final response = await http.post(url, body: {'nuid': globals.user_nuid,'password': globals.user_pass,'ruang': globals.nama_terdekat,'x': koordinat.x*10,'y': koordinat.y*10});
+      print(response);
+      print("\n");
       if(globals.nama_terdekat != "null"){
         globals.user_current_ruang = globals.nama_terdekat;
         globals.user_current_x = koordinat.x;
