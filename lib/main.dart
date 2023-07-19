@@ -44,7 +44,7 @@ void main() {
   
   globals.TXmanager = MQTTManager(
         host: globals.mqtt_host,
-        topic: "tx",
+        topic: globals.mqtt_topic_transmitt,
         identifier: "Android",);
         // state: currentAppState);
   globals.TXmanager.initializeMQTTClient();

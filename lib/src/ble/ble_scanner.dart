@@ -34,7 +34,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
   Stream<BleScannerState> get state => _stateStreamController.stream;
 
   void startScan(List<Uuid> serviceIds) async {
-    timer = Timer.periodic(Duration(milliseconds: 5000), (Timer t) => updateValue());
+    timer = Timer.periodic(Duration(milliseconds: 1000), (Timer t) => updateValue());
     _logMessage('Start ble discovery');
     _devices.clear();
     _pushState();
@@ -62,11 +62,11 @@ class BleScanner implements ReactiveState<BleScannerState> {
     List<bool> M202f = [false, false, false];
     List<bool> M203f = [false, false, false];
     List<bool> parkiranf = [false, false, false];
-    var bleCount = 0;
+    globals.bleCount = 0;
     for(var device in _devices){
       var title = device.name;
       if((title == "M102" || title == "M103" || title == "M104" || title == "M202" || title == "M203" || title == "parkiran") && device.manufacturerData.length > 15){
-        bleCount++;
+        globals.bleCount++;
         // var major = (device.manufacturerData[20]<<8) + device.manufacturerData[21];
         var minor = (device.manufacturerData[22]<<8) + device.manufacturerData[23];
         // var txPower = device.manufacturerData[24] > 127 ? device.manufacturerData[24].toInt()-255 : device.manufacturerData[24];
@@ -114,7 +114,22 @@ class BleScanner implements ReactiveState<BleScannerState> {
       if(M203f[a] == false) globals.M203.ble[a] = DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []);
       if(parkiranf[a] == false) globals.parkiran.ble[a] = DiscoveredDevice(id: "0", name: "", serviceData: {}, manufacturerData: Uint8List(0), rssi: 0, serviceUuids: []);
     }
-    if(bleCount > 0){      
+    if(globals.bleCount == 0){
+      globals.iteration++;
+      if(globals.iteration >= 30){
+        String msg = "nuid=${globals.user_nuid}";
+        msg += "&password=${globals.user_pass}";
+        msg += "&aksi=checkout";
+        globals.TXmanager.publish(msg);
+        globals.iteration = 0;
+        _devices.clear();
+        _pushState();
+      }
+      return;
+    }
+    else globals.iteration = 0;
+    
+    if(globals.bleCount > 0){      
       String msg = "nuid=${globals.user_nuid}";
       msg += "&password=${globals.user_pass}";
       msg += "&aksi=checkin";
@@ -167,12 +182,15 @@ class BleScanner implements ReactiveState<BleScannerState> {
       msg += "&ruang=${globals.nama_terdekat}";
       msg += "&x=${koordinat.x*10}";
       msg += "&y=${koordinat.y*10}";
+      if(globals.nama_terdekat != "null"){
+        globals.user_current_ruang = globals.nama_terdekat;
+        globals.user_current_x = koordinat.x;
+        globals.user_current_y = koordinat.y;
+      }
       if(koordinat.x != 0 && koordinat.y != 0) globals.TXmanager.publish(msg);
     }
-
-
-    _pushState();
     _devices.clear();
+    _pushState();
   }
 
   double jarak_terdekat(List<DiscoveredDevice> d){
@@ -205,7 +223,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
         var major = (device.manufacturerData[20]<<8) + device.manufacturerData[21];
         var minor = (device.manufacturerData[22]<<8) + device.manufacturerData[23];
         var rssi = globals.kalman![((major-1)*3)+(minor-1)].filtered(device.rssi.toDouble());
-        var jarak = rssiToDistance(rssi);
+        var jarak = globals.rssiToDistance(rssi);
         d.jarak[index] = jarak;
       }
       index++;   
@@ -263,20 +281,6 @@ class BleScanner implements ReactiveState<BleScannerState> {
 
   Future<void> dispose() async {
     await _stateStreamController.close();
-  }
-  double rssiToDistance(double rssi) {
-    double distance;
-    double referenceRssi = -40.00;
-    double referenceDistance = 1.00;
-    double pathLossExponent = 0.33;
-    double flatFadingMitigation = 0;
-    double rssiDiff = rssi - referenceRssi - flatFadingMitigation;
-
-    double i =  pow(10, -(rssiDiff/ 10 * pathLossExponent) - ((rssi/1000)*-1)).toDouble();
-
-    distance = referenceDistance * i;
-
-    return distance;
   }
 
   StreamSubscription? _subscription;

@@ -2,10 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ble_scanner/src/globals.dart' as globals;
-import 'package:http/http.dart' as http;
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'dart:convert' show jsonDecode;
-import 'dart:async';
 import '../ble/ble_logger.dart';
 import 'package:ble_scanner/src/ble/ble_scanner.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
@@ -53,14 +50,14 @@ class MonitoringPageStateful extends StatefulWidget {
 }
 
 class MonitoringPageState extends State<MonitoringPageStateful> {
-  Timer? timer;
   late UserLocation? userLocation;
   late TextEditingController _uuidController;
+  globals.coordinates koordinat = globals.coordinates(0, 0);
   var f = NumberFormat("###0.0#", "en_US");
 
   @override
   void initState() {
-    timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => updateValue());
+    globals.nama_terdekat = "local";
     userLocation = UserLocation(nuid: "0", name: "", username: "", email: "", currentLocation: Location(x: "0", y: "0", ruang: " ", timestamp: " "));
     super.initState();
     _uuidController = TextEditingController()..addListener(() => setState(() {}));
@@ -69,7 +66,6 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
   }
 
@@ -92,30 +88,6 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
     widget.startScan(text.isEmpty ? [] : [Uuid.parse(_uuidController.text)]);
   }
 
-  void updateValue() async {
-    var url = Uri.parse(globals.endpoint_karyawan_get);
-    var response = await http.post(url, body: {'nuid': globals.user_nuid});
-    if (response.statusCode == 200) {
-      Map<String, dynamic> parsed = jsonDecode(response.body);
-      if (this.mounted) {
-        setState(() {
-          userLocation = UserLocation(
-            nuid: parsed['nuid'], 
-            name: parsed['name'], 
-            username: parsed['username'], 
-            email: parsed['email'], 
-            currentLocation: parsed['currentLocation'] != null ?
-              Location( x: parsed['currentLocation']['x'], y: parsed['currentLocation']['y'], ruang: parsed['currentLocation']['ruang'], timestamp: parsed['currentLocation']['timestamp']) :
-              Location( x: "0", y: "0", ruang: " ", timestamp: " ")
-          );
-
-          // userLocation =
-          // userLocation = List<UserLocation>.from((jsonDecode(response.body)).map((x) => UserLocation.fromJson(x)).where((content) => content.nuid != null));
-        });
-      }
-    }
-  }
-
   Widget build(BuildContext context) {
     double mapWidth = MediaQuery.of(context).size.width / 1.2;
 
@@ -124,7 +96,6 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
         leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () => {
-                  timer?.cancel(),
                   Navigator.pop(context),
                 }),
         title: Text("Mapping Karyawan"),
@@ -134,6 +105,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
           scrollDirection: Axis.vertical,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(height: 20),
             Container(
               margin: EdgeInsets.only(left: 30, right: 30, top: 20),
               height: 90.0,
@@ -141,7 +113,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
               child: Card(
                 child: Padding(
                   padding: EdgeInsets.only(top: 15, left:15, right:15, bottom: 15),
-                  child: Text("Lokasi (${userLocation!.currentLocation.ruang})\nX : ${f.format(double.parse(userLocation!.currentLocation.x))}\nY : ${f.format(double.parse(userLocation!.currentLocation.y))}"),
+                  child: Text("Lokasi (${globals.user_current_ruang})\nX : ${f.format(globals.user_current_x)}\nY : ${f.format(globals.user_current_y)}"),
                 ),
               ),
             ),
@@ -150,7 +122,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
               child: Stack(
                 children: <Widget>[                  
                   globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp1.png') : Image.asset(width: mapWidth, 'assets/img/m1.png'),
-                    userLocation!.currentLocation.ruang == '1' || userLocation!.currentLocation.ruang == "parkiran" ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
+                    globals.nama_terdekat[1] == '1' || globals.nama_terdekat == "parkiran" ? dots(globals.user_current_ruang, mapWidth, context) : SizedBox(),
                 ]
               )
             ),
@@ -159,7 +131,7 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
               child: Stack(
                 children: <Widget>[
                   globals.showParkir ? Image.asset(width: mapWidth, 'assets/img/mp2.png') : Image.asset(width: mapWidth, 'assets/img/m2.png'),
-                  userLocation!.currentLocation.ruang == '2' ? dots(userLocation!, userLocation!.currentLocation.x, userLocation!.currentLocation.y, userLocation!.currentLocation.ruang, mapWidth, context) : SizedBox(),
+                  globals.nama_terdekat[1] == '2' ? dots(globals.user_current_ruang, mapWidth, context) : SizedBox(),
                 ]
               )
             ),
@@ -169,58 +141,45 @@ class MonitoringPageState extends State<MonitoringPageStateful> {
       ),
     );
   }
-}
-
-// Widget printDots(List<UserLocation> data, int lantai, double width){
-//   List<Widget> list = <Widget>[];
-//   for(var i = 0; i < data.length; i++){
-//     list.add(dots(data[0].nuid, data[0].currentLocation.x, data[0].currentLocation.y, data[0].currentLocation.ruang, width));
-//   }
-//   return Stack(
-//                 // fit: StackFit.expand,
-//                 children: <Widget>[
-//                 ];
-// }
-
-Widget dots(UserLocation user, String xStr, String yStr, String ruang, double width, BuildContext context) {
-  var f = NumberFormat("###0.0#", "en_US");
-  double x = double.parse(xStr);
-  double y = double.parse(yStr);
-  int totalWidth = 310; //map tanpa parkir
-  if (globals.showParkir) totalWidth = 510; //map dengan parkir
-  int plusX = 0;
-  int plusY = (width / (totalWidth / 96)).toInt();
-  double scaleCircle = 15;
-  double scaleText = 20;
-  if (ruang == "parkiran") {
-    plusX = (width / (totalWidth / 310)).toInt();
-    plusY = (width / (totalWidth / 84)).toInt();
+  
+  Widget dots(String ruang, double width, BuildContext context) {
+    var f = NumberFormat("###0.0#", "en_US");
+    int totalWidth = 310; //map tanpa parkir
+    if (globals.showParkir) totalWidth = 510; //map dengan parkir
+    int plusX = 0;
+    int plusY = (width / (totalWidth / 96)).toInt();
+    double scaleCircle = 15;
+    double scaleText = 20;
+    if (ruang == "parkiran") {
+      plusX = (width / (totalWidth / 310)).toInt();
+      plusY = (width / (totalWidth / 84)).toInt();
+    }
+    if (ruang == "M103" || ruang == "M203") {
+      plusX = (width / (totalWidth / 76)).toInt();
+    } else if (ruang == "M104" || ruang == "M204") plusX = (width / (totalWidth / 158)).toInt();
+    return Positioned(
+      left: ((width / (totalWidth / (globals.user_current_x*10)) + plusX)) - ((width / scaleCircle) / 2),
+      top: ((width / (totalWidth / (globals.user_current_y*10)) + plusY)) - ((width / scaleCircle) / 2),
+      width: width / scaleCircle,
+      height: width / scaleCircle,
+      child: GestureDetector(
+          onTap: () {
+            Alert(
+                context: context,
+                desc: "NUID :\n${globals.user_nuid}\n\nName :\n${globals.user_name}\n\nUsername :\n${globals.user_username}\n\nEmail :\n${globals.user_email}\n\nLokasi (${globals.nama_terdekat})\nX : ${f.format(globals.user_current_x)}\nY : ${f.format(globals.user_current_y)}",
+                buttons: [],
+                style: AlertStyle(
+                  descStyle: TextStyle(fontSize: 15),
+                  descTextAlign: TextAlign.start,
+                )).show();
+          },
+          child: CircleAvatar(
+            backgroundColor: Color.fromARGB(200, 255, 0, 0),
+            child: Text(globals.user_nuid, style: TextStyle(fontSize: width / scaleText)),
+            foregroundImage: NetworkImage("enterImageUrl"),
+          )),
+    );
   }
-  if (ruang == "M103" || ruang == "M203") {
-    plusX = (width / (totalWidth / 76)).toInt();
-  } else if (ruang == "M104" || ruang == "M204") plusX = (width / (totalWidth / 158)).toInt();
-  return Positioned(
-    left: ((width / (totalWidth / x) + plusX)) - ((width / scaleCircle) / 2),
-    top: ((width / (totalWidth / y) + plusY)) - ((width / scaleCircle) / 2),
-    width: width / scaleCircle,
-    height: width / scaleCircle,
-    child: GestureDetector(
-        onTap: () {
-          Alert(
-              context: context,
-              desc: "NUID :\n${user.nuid}\n\nName :\n${user.name}\n\nUsername :\n${user.username}\n\nEmail :\n${user.email}\n\nLokasi (${user.currentLocation.ruang})\nX : ${f.format(double.parse(user.currentLocation.x))}\nY : ${f.format(double.parse(user.currentLocation.y))}",
-              buttons: [],
-              style: AlertStyle(
-                descStyle: TextStyle(fontSize: 15),
-                descTextAlign: TextAlign.start,
-              )).show();
-        },
-        child: CircleAvatar(
-          backgroundColor: Color.fromARGB(200, 255, 0, 0),
-          child: Text(user.nuid, style: TextStyle(fontSize: width / scaleText)),
-          foregroundImage: NetworkImage("enterImageUrl"),
-        )),
-  );
 }
 
 class UserLocation {

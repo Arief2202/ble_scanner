@@ -7,6 +7,7 @@ import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:simple_kalman/simple_kalman.dart';
 import './mqtt/state/MQTTAppState.dart';
 import './mqtt/MQTTManager.dart';
+import 'dart:math';
 
 bool showParkir = false;
 
@@ -20,6 +21,9 @@ String endpoint_list_karyawan_get_all = endpoint + "/user/get_all.php";
 String endpoint_monitor_karyawan_get_all = endpoint + "/monitor_karyawan/get_all.php";
 String endpoint_history_presensi_get_all = endpoint + "/history_presensi/get_all.php";
 String endpoint_cek_absensi = endpoint + "/location/update.php";
+
+int bleCount = 0;
+int iteration = 0;
 
 String nama_terdekat = "";
 String mqtt_host = "eepis.tech";
@@ -43,6 +47,21 @@ late MQTTManager TXmanager;
 late MQTTManager manager;
 late MQTTAppState currentAppState;
 String msg = "";
+
+double rssiToDistance(double rssi) {
+  double distance;
+  double referenceRssi = -50;
+  double referenceDistance = 0.944;
+  double pathLossExponent = 0.3;
+  double flatFadingMitigation = 0;
+  double rssiDiff = rssi - referenceRssi - flatFadingMitigation;
+
+  double i =  pow(10, -(rssiDiff/ 10 * pathLossExponent)).toDouble();
+
+  distance = referenceDistance * i;
+
+  return distance;
+}
 
 bleDevices nowLocation = bleDevices(
   "M102",
