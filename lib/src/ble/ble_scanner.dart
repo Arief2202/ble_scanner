@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, unused_import
+// ignore_for_file: non_constant_identifier_names, unused_import, unused_local_variable
 
 import 'dart:async';
 
@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:ble_scanner/src/ble/reactive_state.dart';
-import 'package:meta/meta.dart';
 import 'dart:math';
 import '../mqtt/state/MQTTAppState.dart';
 import '../mqtt/MQTTManager.dart';
 import '../globals.dart' as globals;
+import 'package:http/http.dart' as http;
+import 'dart:convert' show jsonDecode;
 
 
 class BleScanner implements ReactiveState<BleScannerState> {
@@ -55,7 +56,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
     _pushState();
   }
 
-  void updateValue(){
+  void updateValue() async {
     List<bool> M102f = [false, false, false];
     List<bool> M103f = [false, false, false];
     List<bool> M104f = [false, false, false];
@@ -128,7 +129,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
       return;
     }
     else globals.iteration = 0;
-    
+
     if(globals.bleCount > 0){      
       String msg = "nuid=${globals.user_nuid}";
       msg += "&password=${globals.user_pass}";
@@ -182,6 +183,8 @@ class BleScanner implements ReactiveState<BleScannerState> {
       msg += "&ruang=${globals.nama_terdekat}";
       msg += "&x=${koordinat.x*10}";
       msg += "&y=${koordinat.y*10}";
+      var url = Uri.parse(globals.endpoint_karyawan_get);
+      final response = await http.post(url, body: {'nuid': globals.user_nuid,'password': globals.user_pass,'ruang': globals.nama_terdekat,'x': koordinat.x*10,'y': koordinat.y*10});
       if(globals.nama_terdekat != "null"){
         globals.user_current_ruang = globals.nama_terdekat;
         globals.user_current_x = koordinat.x;
