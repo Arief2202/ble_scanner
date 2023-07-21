@@ -121,6 +121,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
         String msg = "nuid=${globals.user_nuid}";
         msg += "&password=${globals.user_pass}";
         msg += "&aksi=checkout";
+        globals.nama_terdekat = "null";      
         globals.TXmanager.publish(msg);
         globals.iteration = 0;
         _devices.clear();
@@ -144,7 +145,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
     }
     
     double terdekat = -100;
-    globals.nama_terdekat = "null";      
+    // globals.nama_terdekat = "null";      
     if(jarak_terdekat(globals.M102.ble) > terdekat){
       terdekat = jarak_terdekat(globals.M102.ble);
       globals.nama_terdekat = "M102";      
@@ -184,7 +185,7 @@ class BleScanner implements ReactiveState<BleScannerState> {
       msg += "&x=${koordinat.x*10}";
       msg += "&y=${koordinat.y*10}";
       var url = Uri.parse(globals.endpoint_cek_absensi);
-      final response = await http.post(url, body: {'nuid': globals.user_nuid,'password': globals.user_pass,'ruang': globals.nama_terdekat,'x': koordinat.x*10,'y': koordinat.y*10});
+      final response = await http.post(url, body: {'nuid': globals.user_nuid,'password': globals.user_pass,'ruang': globals.nama_terdekat,'x': (koordinat.x*10).toString(),'y': (koordinat.y*10).toString()});
       print(response);
       print("\n");
       if(globals.nama_terdekat != "null"){
